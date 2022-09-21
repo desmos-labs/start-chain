@@ -1,0 +1,7 @@
+# Ignore jetbrains IDE
+.idea/
+
+# Ignore locals runs
+mytestnet
+desmos
+start-chain.log
