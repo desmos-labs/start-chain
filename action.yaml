@@ -1,0 +1,27 @@
+name: 'Start chain'
+description: 'Action to start a desmos chain'
+inputs:
+  version:
+    description: 'Binary version to be used when starting the chain'
+    required: true
+
+  genesis-file:
+    description: 'Path to the genesis file that should be used to start the chain'
+    required: false
+    default: ''
+
+  pre-run:
+    description: 'Script to be executed before the chain has started'
+    required: false
+    default: ''
+
+  post-run:
+    description: 'Script to be executed after the chain has started'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - run: ./start-chain ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }}
+      shell: bash
