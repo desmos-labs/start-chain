@@ -13,5 +13,5 @@ jobs:
         with:
           version: v4.4.1
 
-      - run: ls -al
+      - run: ./desmos q block
         shell: bash
