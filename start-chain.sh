@@ -61,6 +61,7 @@ prepare_chain() {
 
 # Runs the chains in background saving the execution log inside the start-chain.log file.
 run_chain() {
+  echo "test running from head"
   ./desmos start --home="./mytestnet/node0/desmos" &> "./start-chain.log" &
 }
 

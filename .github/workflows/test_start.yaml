@@ -9,9 +9,10 @@ jobs:
     name: Test chain start
     steps:
       - name: Start chain
-        uses: desmos-labs/start-chain@v1
+        uses: desmos-labs/start-chain@manuel/DCD-121/start-chain-action
         with:
           version: v4.4.1
 
-      - run: ./desmos q block
+      - name: Query block
+        run: ./desmos q block
         shell: bash
