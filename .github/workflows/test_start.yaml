@@ -6,7 +6,7 @@ on:
 jobs:
   test_chain_start:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: Test chain start
     steps:
       - name: Start chain
         uses: desmos-labs/start-chain@v1

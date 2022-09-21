@@ -23,5 +23,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: ./start-chain ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }}
+    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+      shell: bash
+
+    - run: start-chain.sh ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }}
       shell: bash
