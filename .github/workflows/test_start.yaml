@@ -1,7 +1,6 @@
 on:
-  push:
-    branches:
-      - manuel/DCD-121/start-chain-action
+  pull_request:
+
 
 jobs:
   test_chain_start:
