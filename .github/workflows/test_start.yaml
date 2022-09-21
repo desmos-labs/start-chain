@@ -8,8 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Test chain start
     steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+        with:
+          path: ./action
+
       - name: Start chain
-        uses: desmos-labs/start-chain@manuel/DCD-121/start-chain-action
+        uses: ./action
         with:
           version: v4.4.1
 
