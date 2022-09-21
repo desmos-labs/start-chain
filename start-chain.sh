@@ -104,7 +104,7 @@ download_desmos "$1"
 prepare_chain "$2"
 
 # Run the pre run script
-DESMOS_HOME="./mytestnet/node0/desmos" run_script "$3"
+DESMOS_HOME="./mytestnet/node0/desmos" DESMOS_BIN="./desmos" run_script "$3"
 
 # Sart the chain as background process
 run_chain
@@ -113,4 +113,4 @@ run_chain
 wait_chain_start
 
 # Run the post run script
-DESMOS_HOME="./mytestnet/node0/desmos" run_script "$4"
+DESMOS_HOME="./mytestnet/node0/desmos" DESMOS_BIN="./desmos" run_script "$4"
