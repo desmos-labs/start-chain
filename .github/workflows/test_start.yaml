@@ -18,6 +18,6 @@ jobs:
         with:
           version: v4.4.1
 
-      - name: Query block
-        run: ./desmos q block
+      - name: Test chain started
+        run: "[[ \"$(./desmos q block | jq '.block')\" != \"null\" ]]"
         shell: bash
