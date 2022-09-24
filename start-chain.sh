@@ -83,7 +83,7 @@ run_script() {
 }
 
 wait_chain_start() {
-  echo "Wait for chain start..."
+  echo "Waiting for chain to start..."
   # Give time to the binary to start
   sleep 2
 
