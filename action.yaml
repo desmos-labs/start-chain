@@ -11,7 +11,7 @@ inputs:
     default: ''
 
   pre-run:
-    description: 'Script to be executed before the chain has started'
+    description: 'Script to be executed before the chain starts'
     required: false
     default: ''
 
