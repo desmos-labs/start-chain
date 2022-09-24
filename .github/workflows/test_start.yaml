@@ -1,0 +1,22 @@
+on:
+  pull_request:
+
+
+jobs:
+  test_chain_start:
+    runs-on: ubuntu-latest
+    name: Test chain start
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+        with:
+          path: ./action
+
+      - name: Start chain
+        uses: ./action
+        with:
+          version: v4.4.1
+
+      - name: Test chain started
+        run: "[[ \"$(./desmos q block | jq '.block')\" != \"null\" ]]"
+        shell: bash
