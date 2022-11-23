@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 # Function to download the desmos binary at a specific version.
 # * `version` - The version to do download, must be in the format vX.X.X.
 download_desmos() {
@@ -12,21 +13,35 @@ download_desmos() {
 
   no_v_version="${version:1}"
   download_url="https://github.com/desmos-labs/desmos/releases/download/$version/desmos-$no_v_version-linux-amd64"
+  download_bin=true
 
-  echo "Downloading desmos version: $version"
-  echo "Download url: $download_url"
+  if test -f ./desmos; then
+    bin_version=$(./desmos version)
 
-  # Download desmos bin
-  wget -O ./desmos "$download_url"
+    if [ $bin_version == $no_v_version ]; then
+      download_bin=false
+      echo "Desmos $version already present skippipng download"
+    fi
+  fi
 
-  # Make desmos bin executable
-  chmod +x ./desmos
+  if $download_bin ; then
+    echo "Downloading desmos version: $version"
+    echo "Download url: $download_url"
+
+    # Download desmos bin
+    wget -O ./desmos "$download_url"
+
+    # Make desmos bin executable
+    chmod +x ./desmos
+  fi
 }
 
 # Prepares the chain with the provided genesis json file.
 # * `user_genesis_file` - Path to the genesis file that will be used to start the chain.
 prepare_chain() {
   user_genesis_file=$1
+
+  echo "Using genesis file: $user_genesis_file"
 
   ./desmos testnet --v 1 --keyring-backend=test \
     --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake"
@@ -35,6 +50,7 @@ prepare_chain() {
   node_genesis_file_path="mytestnet/node0/desmos/config/genesis.json"
 
   if test -f "$user_genesis_file"; then
+    echo "Genesis file available: $user_genesis_file"
     # Load genesis file
     genesis_content=$(cat "$node_genesis_file_path")
     # Append balances
