@@ -121,13 +121,10 @@ run_script() {
 
 wait_chain_start() {
   log "Waiting for chain to start..."
-  # Give time to the binary to start
-  sleep 2
-
-  block="$($DESMOS_BIN q block | jq '.block')"
-  while [ "$block" == "null" ]; do
+  block="$($DESMOS_BIN q block 2> /dev/null | jq '.block')"
+  while [ "$block" == "null" ] || [ -z "$block" ]; do
     sleep 1
-    block="$($DESMOS_BIN q block | jq '.block')"
+    block="$($DESMOS_BIN q block 2> /dev/null | jq '.block')"
   done
 
   log "Chain started!"
