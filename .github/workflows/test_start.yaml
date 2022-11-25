@@ -14,9 +14,17 @@ jobs:
 
       - name: Start chain
         uses: ./action
+        id: start-chain
         with:
           version: v4.4.1
 
       - name: Test chain started
         run: "[[ \"$(./desmos q block | jq '.block')\" != \"null\" ]]"
         shell: bash
+
+      - name: Check outputs
+        run: '[[ ! -z "$DESMOS_BIN" ]] && [[ ! -z "$DESMOS_HOME" ]]'
+        shell: bash
+        env:
+          DESMOS_BIN: ${{ steps.start-chain.outputs.desmos-bin }}
+          DESMOS_HOME: ${{ steps.start-chain.outputs.desmos-home }}
