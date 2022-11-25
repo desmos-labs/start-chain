@@ -122,9 +122,17 @@ run_script() {
 wait_chain_start() {
   log "Waiting for chain to start..."
   block="$($DESMOS_BIN q block 2> /dev/null | jq '.block')"
+  i=0
   while [ "$block" == "null" ] || [ -z "$block" ]; do
     sleep 1
     block="$($DESMOS_BIN q block 2> /dev/null | jq '.block')"
+    ((i=i+1))
+    if [ $i == 15 ] ; then
+      >&2 echo "Chain start failed"
+      >&2 cat ./start-chain.log
+      >&2 ls "$DESMOS_HOME"
+      exit 1
+    fi
   done
 
   log "Chain started!"
