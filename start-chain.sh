@@ -57,10 +57,10 @@ prepare_chain() {
     # Get chain id from genesis file
     user_chain_id=$(jq -r '.chain_id' "$user_genesis_file")
     $DESMOS_BIN testnet --v 1 --keyring-backend=test --chain-id="$user_chain_id" \
-        --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake" > /dev/null 2>&1
+        --gentx-coin-denom="stake" --minimum-gas-prices="0stake" > /dev/null 2>&1
   else
     $DESMOS_BIN testnet --v 1 --keyring-backend=test \
-            --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake" > /dev/null 2>&1
+            --gentx-coin-denom="stake" --minimum-gas-prices="0stake" > /dev/null 2>&1
   fi
 
   # Generated genesis file path
