@@ -19,8 +19,10 @@ jobs:
           version: v4.4.1
 
       - name: Test chain started
-        run: "[[ \"$(./desmos q block | jq '.block')\" != \"null\" ]]"
+        run: "[[ \"$($DESMOS_BIN q block | jq '.block')\" != \"null\" ]]"
         shell: bash
+        env:
+          DESMOS_BIN: ${{ steps.start-chain.outputs.desmos-bin }}
 
       - name: Check outputs
         run: '[[ ! -z "$DESMOS_BIN" ]] && [[ ! -z "$DESMOS_HOME" ]]'

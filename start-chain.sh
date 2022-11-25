@@ -10,6 +10,10 @@ log() {
   fi
 }
 
+stderr_echo() {
+  >&2 echo "$1"
+}
+
 
 # Function to download the desmos binary at a specific version.
 # * `version` - The version to do download, must be in the format vX.X.X.
@@ -57,10 +61,10 @@ prepare_chain() {
     # Get chain id from genesis file
     user_chain_id=$(jq -r '.chain_id' "$user_genesis_file")
     $DESMOS_BIN testnet --v 1 --keyring-backend=test --chain-id="$user_chain_id" \
-        --gentx-coin-denom="stake" --minimum-gas-prices="0stake" > /dev/null 2>&1
+        --gentx-coin-denom="stake" --minimum-gas-prices="0stake" --output-dir "$SCRIPT_DIR/mytestnet" > /dev/null 2>&1
   else
     $DESMOS_BIN testnet --v 1 --keyring-backend=test \
-            --gentx-coin-denom="stake" --minimum-gas-prices="0stake" > /dev/null 2>&1
+            --gentx-coin-denom="stake" --minimum-gas-prices="0stake" --output-dir "$SCRIPT_DIR/mytestnet" > /dev/null 2>&1
   fi
 
   # Generated genesis file path
@@ -121,13 +125,19 @@ run_script() {
 
 wait_chain_start() {
   log "Waiting for chain to start..."
-  # Give time to the binary to start
-  sleep 2
+  block="$($DESMOS_BIN q block 2> /dev/null | jq '.block')"
+  attempts=0
+  while [ "$block" == "null" ] || [ -z "$block" ]; do
+    # Fail if the chain don't come online
+    if [ "$attempts" == 10 ] ; then
+      stderr_echo "Chain start failed"
+      >&2 cat ./start-chain.log
+      break
+    fi
 
-  block="$($DESMOS_BIN q block | jq '.block')"
-  while [ "$block" == "null" ]; do
     sleep 1
-    block="$($DESMOS_BIN q block | jq '.block')"
+    block="$($DESMOS_BIN q block 2> /dev/null | jq '.block')"
+    ((attempts=attempts+1))
   done
 
   log "Chain started!"
