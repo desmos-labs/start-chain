@@ -111,7 +111,11 @@ run_script() {
     fi
 
     # Run the script
-    bash "$script_path"
+    output=$(bash "$script_path")
+    # On failure write script output to stderr
+    if [ $? != 0 ]; then
+      >&2 echo "$output"
+    fi
   fi
 }
 
@@ -141,8 +145,7 @@ download_desmos "$1"
 prepare_chain "$2"
 
 # Run the pre run script
-pre_run_script_output=$(DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$3")
-log "$pre_run_script_output"
+DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$3"
 
 # Sart the chain as background process
 run_chain
@@ -151,5 +154,4 @@ run_chain
 wait_chain_start
 
 # Run the post run script
-post_run_script_output=$(DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$4")
-log "$post_run_script_output"
+DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$4"
