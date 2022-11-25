@@ -6,7 +6,7 @@ GitHub action to spawn a Desmos chain
 
 * [Example workflow](#example-workflow)
 * [Inputs](#inputs)
-
+* [Outputs](#outputs)
 
 ## Example workflow
 
@@ -40,3 +40,11 @@ jobs:
 | `genesis-file` |          | Path to the genesis file that should be used to start the chain | string | ""      |
 | `pre-run`      |          | Script to be executed before the chain starts                   | string | ""      |
 | `post-run`     |          | Script to be executed after the chain has started               | string | ""      |
+
+
+## Outputs
+
+| Name         | Description        |
+|--------------|--------------------|
+| `desmo-bin`  | Desmos binary path |
+| `desmo-home` | Desmos home path   |

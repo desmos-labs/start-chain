@@ -20,11 +20,20 @@ inputs:
     required: false
     default: ''
 
+outputs:
+  desmos-bin:
+    description: "Desmos binary path"
+    value: ${{ steps.start-chain.outputs.desmos-bin }}
+  desmos-home:
+    description: "Desmos home path"
+    value: ${{ steps.start-chain.outputs.desmos-home }}
+
 runs:
   using: "composite"
   steps:
     - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
       shell: bash
 
-    - run: start-chain.sh ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }}
+    - id: start-chain
+      run: CI=true start-chain.sh ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }} >> $GITHUB_OUTPUT
       shell: bash

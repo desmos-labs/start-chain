@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+DESMOS_BIN="$SCRIPT_DIR/desmos"
+DESMOS_HOME="$SCRIPT_DIR/mytestnet/node0/desmos"
+
+log() {
+  if [ "$CI" != "true" ] ; then
+    echo "$1"
+  fi
+}
+
 
 # Function to download the desmos binary at a specific version.
 # * `version` - The version to do download, must be in the format vX.X.X.
@@ -7,7 +17,7 @@ download_desmos() {
   version=$1
 
   if ! [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Version must be in the format vX.X.X"
+    log "Version must be in the format vX.X.X"
     exit 1
   fi
 
@@ -15,24 +25,24 @@ download_desmos() {
   download_url="https://github.com/desmos-labs/desmos/releases/download/$version/desmos-$no_v_version-linux-amd64"
   download_bin=true
 
-  if test -f ./desmos; then
+  if test -f "$DESMOS_BIN"; then
     bin_version=$(./desmos version)
 
-    if [ $bin_version == $no_v_version ]; then
+    if [ "$bin_version" == "$no_v_version" ]; then
       download_bin=false
-      echo "Desmos $version already present skippipng download"
+      log "Desmos $version already present skippipng download"
     fi
   fi
 
   if $download_bin ; then
-    echo "Downloading desmos version: $version"
-    echo "Download url: $download_url"
+    log "Downloading desmos version: $version"
+    log "Download url: $download_url"
 
     # Download desmos bin
-    wget -O ./desmos "$download_url"
+    wget -O "$DESMOS_BIN" "$download_url"
 
     # Make desmos bin executable
-    chmod +x ./desmos
+    chmod +x "$DESMOS_BIN"
   fi
 }
 
@@ -41,16 +51,16 @@ download_desmos() {
 prepare_chain() {
   user_genesis_file=$1
 
-  echo "Using genesis file: $user_genesis_file"
+  log "Using genesis file: $user_genesis_file"
 
-  ./desmos testnet --v 1 --keyring-backend=test \
-    --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake"
+  $DESMOS_BIN testnet --v 1 --keyring-backend=test \
+    --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake" > /dev/null 2>&1
 
   # Generated genesis file path
-  node_genesis_file_path="mytestnet/node0/desmos/config/genesis.json"
+  node_genesis_file_path="$DESMOS_HOME/config/genesis.json"
 
   if test -f "$user_genesis_file"; then
-    echo "Genesis file available: $user_genesis_file"
+    log "Genesis file available: $user_genesis_file"
     # Load genesis file
     genesis_content=$(cat "$node_genesis_file_path")
     # Append balances
@@ -77,7 +87,7 @@ prepare_chain() {
 
 # Runs the chains in background saving the execution log inside the start-chain.log file.
 run_chain() {
-  ./desmos start --home="./mytestnet/node0/desmos" &>"./start-chain.log" &
+  $DESMOS_BIN start --home="$DESMOS_HOME" &>"./start-chain.log" &
 }
 
 # Runs the provided script.
@@ -89,27 +99,32 @@ run_script() {
   if [[ -n "$script_path" ]]; then
     # Check if the post run script exists
     if ! test -f "$script_path"; then
-      echo "Can't run script, don't exists in path: $PWD/$user_genesis_file"
+      log "Can't run script, don't exists in path: $PWD/$user_genesis_file"
       exit 1
     fi
 
-    # Run the post run script
+    # Run the script
     bash "$script_path"
   fi
 }
 
 wait_chain_start() {
-  echo "Waiting for chain to start..."
+  log "Waiting for chain to start..."
   # Give time to the binary to start
   sleep 2
 
-  block="$(./desmos q block | jq '.block')"
+  block="$($DESMOS_BIN q block | jq '.block')"
   while [ "$block" == "null" ]; do
     sleep 1
-    block="$(./desmos q block | jq '.block')"
+    block="$($DESMOS_BIN q block | jq '.block')"
   done
 
-  echo "Chain started!"
+  log "Chain started!"
+
+  if [ "$CI" == "true" ] ; then
+    echo "desmos-bin=$DESMOS_BIN"
+    echo "desmos-home=$DESMOS_HOME"
+  fi
 }
 
 # Download the requested desmos version
@@ -119,7 +134,8 @@ download_desmos "$1"
 prepare_chain "$2"
 
 # Run the pre run script
-DESMOS_HOME="./mytestnet/node0/desmos" DESMOS_BIN="./desmos" run_script "$3"
+pre_run_script_output=$(DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$3")
+log "$pre_run_script_output"
 
 # Sart the chain as background process
 run_chain
@@ -128,4 +144,5 @@ run_chain
 wait_chain_start
 
 # Run the post run script
-DESMOS_HOME="./mytestnet/node0/desmos" DESMOS_BIN="./desmos" run_script "$4"
+post_run_script_output=$(DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$4")
+log "$post_run_script_output"
