@@ -35,5 +35,5 @@ runs:
       shell: bash
 
     - id: start-chain
-      run: CI=true start-chain.sh ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }} >> $GITHUB_OUTPUT
+      run: CI=true start-chain.sh -v ${{ inputs.version }} -g "${{ inputs.genesis-file }}" -p "${{ inputs.pre-run }}" -P "${{ inputs.post-run }}" >> $GITHUB_OUTPUT
       shell: bash

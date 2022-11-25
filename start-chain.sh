@@ -135,14 +135,60 @@ wait_chain_start() {
   fi
 }
 
+VALID_ARGS=$(getopt -o v:g:p:P:i:h --long version:,genesis:,pre-run:,post-run:,chain-id:,help -- "$@")
+if [[ $? -ne 0 ]]; then
+    exit 1;
+fi
+
+
+desmos_version=""
+genesis_file=""
+pre_run_script=""
+post_run_script=""
+
+eval set -- "$VALID_ARGS"
+while [ : ]; do
+  case "$1" in
+    -v | --version)
+        desmos_version=$2
+        shift 2
+        ;;
+    -g | --genesis)
+        genesis_file=$2
+        shift 2
+        ;;
+    -p | --pre-run)
+        pre_run_script=$2
+        shift 2
+        ;;
+    -P | --post-run)
+        post_run_script=$2
+        shift 2
+        ;;
+    -h | --help)
+        echo "Script to start a Desmos chain for testing purpose"
+        echo "Usage: $(basename "$0") [OPTION]..."
+        echo ""
+        echo -e "-v, --version\t Desmos chain version ex: v4.6.3"
+        echo -e "-g, --genesis\t chain genesis file"
+        echo -e "-p, --pre-run\t script to run before the chain starts"
+        echo -e "-P, --post-tun\t script to run after the chains is started"
+        exit 0
+        ;;
+    --) shift;
+        break
+        ;;
+  esac
+done
+
 # Download the requested desmos version
-download_desmos "$1"
+download_desmos "$desmos_version"
 
 # Prepare the chain with the provided genesis file
-prepare_chain "$2"
+prepare_chain "$genesis_file"
 
 # Run the pre run script
-DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$3"
+DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$pre_run_script"
 
 # Sart the chain as background process
 run_chain
@@ -151,4 +197,4 @@ run_chain
 wait_chain_start
 
 # Run the post run script
-DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$4"
+DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$post_run_script"
