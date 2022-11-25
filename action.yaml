@@ -5,6 +5,11 @@ inputs:
     description: 'Binary version to be used when starting the chain'
     required: true
 
+  min-gas-price:
+    description: 'Chain min gas price'
+    required: false
+    default: '0stake'
+
   genesis-file:
     description: 'Path to the genesis file that should be used to start the chain'
     required: false
@@ -35,5 +40,5 @@ runs:
       shell: bash
 
     - id: start-chain
-      run: CI=true start-chain.sh ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.pre-run }} ${{ inputs.post-run }} >> $GITHUB_OUTPUT
+      run: CI=true start-chain.sh ${{ inputs.version }} ${{ inputs.genesis-file }} ${{ inputs.min-gas-price }} ${{ inputs.pre-run }} ${{ inputs.post-run }} >> $GITHUB_OUTPUT
       shell: bash

@@ -34,12 +34,13 @@ jobs:
 
 ## Inputs
 
-| Name           | Required | Description                                                     | Type   | Default |
-|----------------|:--------:|-----------------------------------------------------------------|--------|---------|
-| `version`      |  `true`  | Binary version to be used when starting the chain               | string |         |
-| `genesis-file` |          | Path to the genesis file that should be used to start the chain | string | ""      |
-| `pre-run`      |          | Script to be executed before the chain starts                   | string | ""      |
-| `post-run`     |          | Script to be executed after the chain has started               | string | ""      |
+| Name            | Required | Description                                                     | Type   | Default  |
+|-----------------|:--------:|-----------------------------------------------------------------|--------|----------|
+| `version`       |  `true`  | Binary version to be used when starting the chain               | string |          |
+| `min-gas-price` |          | Chain min gas price                                             | string | "0stake" |
+| `genesis-file`  |          | Path to the genesis file that should be used to start the chain | string | ""       |
+| `pre-run`       |          | Script to be executed before the chain starts                   | string | ""       |
+| `post-run`      |          | Script to be executed after the chain has started               | string | ""       |
 
 
 ## Outputs
