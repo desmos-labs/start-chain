@@ -57,10 +57,10 @@ prepare_chain() {
     # Get chain id from genesis file
     user_chain_id=$(jq -r '.chain_id' "$user_genesis_file")
     $DESMOS_BIN testnet --v 1 --keyring-backend=test --chain-id="$user_chain_id" \
-        --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake" > /dev/null 2>&1
+        --gentx-coin-denom="stake" --minimum-gas-prices="0stake" > /dev/null 2>&1
   else
     $DESMOS_BIN testnet --v 1 --keyring-backend=test \
-            --gentx-coin-denom="stake" --minimum-gas-prices="0.000006stake" > /dev/null 2>&1
+            --gentx-coin-denom="stake" --minimum-gas-prices="0stake" > /dev/null 2>&1
   fi
 
   # Generated genesis file path
@@ -111,7 +111,11 @@ run_script() {
     fi
 
     # Run the script
-    bash "$script_path"
+    output=$(bash "$script_path")
+    # On failure write script output to stderr
+    if [ $? != 0 ]; then
+      >&2 echo "$output"
+    fi
   fi
 }
 
@@ -141,8 +145,7 @@ download_desmos "$1"
 prepare_chain "$2"
 
 # Run the pre run script
-pre_run_script_output=$(DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$3")
-log "$pre_run_script_output"
+DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$3"
 
 # Sart the chain as background process
 run_chain
@@ -151,5 +154,4 @@ run_chain
 wait_chain_start
 
 # Run the post run script
-post_run_script_output=$(DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$4")
-log "$post_run_script_output"
+DESMOS_HOME="$DESMOS_HOME" DESMOS_BIN="$DESMOS_BIN" run_script "$4"
